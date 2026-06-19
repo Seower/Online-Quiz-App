@@ -1,0 +1,431 @@
+package RAFAY;
+
+import java.util.ArrayList; 
+import java.util.List;
+import java.util.Scanner;
+
+abstract class User { 
+	//base class
+    protected String registrationNumber; // field for registration no.
+    protected String password; // field for password
+
+    public User(String registrationNumber, String password) {
+        this.registrationNumber = registrationNumber;
+        this.password = password;
+    }
+
+    public abstract void displayRole();
+}
+
+class RegularUser extends User {
+    private List<String> quizHistory = new ArrayList<>(); //field for quiz history
+
+    public RegularUser(String registrationNumber, String password) {
+    	// Constructor for RegularUser
+        super(registrationNumber, password);
+    }
+
+    @Override
+    public void displayRole() {
+        System.out.println("Role: Regular User");
+    }
+
+    public void viewProfile() {
+        System.out.println("Viewing profile for " + registrationNumber);
+    }
+
+    public void addQuizToHistory(String quizName) { //parameter
+        quizHistory.add(quizName);
+    }
+
+    public void showQuizHistory() {
+        System.out.println("Quiz History: " + quizHistory);
+    }
+}
+
+class Quiz {  
+	// High cohesion class
+    private String category;
+    private String difficultyLevel;
+    private List<String> questions;
+    private List<String[]> options;
+    private List<String> correctAnswers;
+
+    public Quiz(String category, String difficultyLevel) {
+    	// Constructor for Quiz
+        this.category = category;
+        this.difficultyLevel = difficultyLevel;
+        this.questions = new ArrayList<>();
+        this.options = new ArrayList<>();
+        this.correctAnswers = new ArrayList<>();
+    }
+     //accessor
+    public String getCategory() {
+        return category;
+    }
+
+    public String getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    //mutator
+    public void addQuestion(String question, String[] options, String correctAnswer) {
+        questions.add(question);
+        this.options.add(options);
+        correctAnswers.add(correctAnswer);
+    }
+
+    public List<String> getQuestions() {
+        return questions;
+    }
+
+    public String[] getOptions(int index) {
+        return options.get(index);
+    }
+
+    public String getCorrectAnswer(int index) {
+        return correctAnswers.get(index);
+    }
+
+    public void displayQuiz() {
+        System.out.println("Category: " + category);
+        System.out.println("Difficulty: " + difficultyLevel);
+    }
+}
+
+public class Onlinequiz {
+    private static List<RegularUser> users = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            // User Authentication
+            System.out.println("Welcome to the Online Quiz System");
+                       
+            System.out.print("Enter Registration Number (8 digits): ");
+            String regNumber = sc.nextLine();
+
+            while (regNumber.length() != 8 || !regNumber.matches("\\d+")) {
+                System.out.println("\u001B[31mInvalid Registration Number. Please enter exactly 8 digits.\u001B[0m");
+                regNumber = sc.nextLine();
+            }
+
+
+            System.out.print("Enter Password (5 digits): ");
+            String password = sc.nextLine();
+
+            while (password.length() != 5 || !password.matches("\\d+")) {
+                System.out.println("\u001B[31mInvalid Password. Please enter exactly 5 digits.\u001B[0m");
+                password = sc.nextLine();
+            }
+
+
+            RegularUser user = new RegularUser(regNumber, password); // Creating object of RegularUser
+            users.add(user); // Register the user
+            user.displayRole();
+
+            boolean continueQuiz = true;
+
+            while (continueQuiz) {
+                            
+                // Subject Selection
+            	  boolean validSubject = false;
+                  String subject = "";
+                  while (!validSubject) {
+                	  System.out.println("\n╔════════════════════════════════╗");
+                	    System.out.println("        Available Subjects");
+                	    System.out.println("╚════════════════════════════════╝");
+                      System.out.println("  1. 📘 Math");
+                      System.out.println("  2. 🔬 Science");
+                      System.out.println("  3. 📜 History");
+                      System.out.println("  4. 🌍 Geography");
+                      System.out.println("  5. 📖 Literature");
+                      System.out.println("  6. ❓ General Knowledge");
+                      System.out.print("Choose a subject (1-6): ");
+                      int subjectChoice = sc.nextInt();
+                      sc.nextLine(); // Clear the buffer
+                      String[] subjects = {"Math", "Science", "History", "Geography", "Literature", "General Knowledge"};
+                      if (subjectChoice >= 1 && subjectChoice <= 6) {
+                          subject = subjects[subjectChoice - 1];
+                          validSubject = true;
+                      } else {
+                    	  System.out.println("\u001B[31mInvalid choice! Please enter a number between 1 and 6.\u001B[0m");
+                      }
+                  }
+
+               // ANSI color codes for the console
+                  final String RESET = "\u001B[0m"; // Reset color
+                  final String GREEN = "\u001B[32m"; // Green for Easy
+                  final String YELLOW = "\u001B[33m"; // Yellow (Orange) for Medium
+                  final String RED = "\u001B[31m"; // Red for Hard
+
+                  // Difficulty Level Selection
+                  boolean validDifficulty = false;
+                  String difficultyLevel = "";
+                  while (!validDifficulty) {
+                	  System.out.println("\n╔════════════════════════════════════╗");
+                	  System.out.println("      ⚡ Choose Difficulty Level ⚡");
+                	  System.out.println("\n╚════════════════════════════════════╝");
+                	  System.out.println("  1. 🌟 Easy  - Take it light and simple!");
+                	  System.out.println("  2. ⚡ Medium - A balanced challenge awaits.");
+                	  System.out.println("  3. 🔥 Hard  - Only for the brave!");
+                      System.out.print("Enter Difficulty Level (1-3): ");
+                      int difficultyChoice = sc.nextInt();
+                      sc.nextLine(); // Clear the buffer
+                      switch (difficultyChoice) {
+                      case 1:
+                          difficultyLevel = "Easy";
+                          System.out.println(GREEN + "You selected Easy!" + RESET);
+                          validDifficulty = true;
+                          break;
+                      case 2:
+                          difficultyLevel = "Medium";
+                          System.out.println(YELLOW + "You selected Medium!" + RESET);
+                          validDifficulty = true;
+                          break;
+                      case 3:
+                          difficultyLevel = "Hard";
+                          System.out.println(RED + "You selected Hard!" + RESET);
+                          validDifficulty = true;
+                          break;
+                      default:
+                    	  System.out.println("\u001B[31mInvalid choice! Please enter a number between 1 and 3.\u001B[0m");
+                    }
+                  }
+               // Display quiz rules
+                  displayRules();
+                Quiz quiz = new Quiz(subject, difficultyLevel); // Creating object of Quiz and  Loose coupling between Quiz and RegularUser
+                generateQuestions(quiz);
+
+                System.out.println("\nQuiz Starting...");
+                startQuiz(quiz, user, sc);
+
+                System.out.print("\nDo you want to continue to another quiz? (yes/no): ");
+                String response = sc.nextLine().trim().toLowerCase();
+                if (response.equals("no")) {
+                    continueQuiz = false;
+                    System.out.println("Thank you for taking the quiz! Goodbye.");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            sc.close();
+        }
+    }
+
+    private static void displayRules() {
+    	System.out.println("\n========================================");
+    	System.out.println("****    QUIZ RULES    ****");
+    	System.out.println("\n========================================");
+    	System.out.println("🚀 1. You only have 2 minutes to answer all questions.");
+    	System.out.println("⏱️ 2. You have to select an option before you can go to the next question.");
+    	System.out.println("🤔 3. There's no going back after selecting an option.");
+    	System.out.println("🏆 4. At the end of the quiz, your score will be displayed.");
+    	System.out.println("⚡ Good luck, and give your best shot! ⚡\n");
+    	System.out.println("========================================");
+        System.out.println("\nPress Enter to start the quiz...");
+        Scanner sc = new Scanner(System.in);
+        sc.nextLine(); // Wait for the user to press Enter before starting the quiz
+    }
+    
+    private static void startQuiz(Quiz quiz, RegularUser user, Scanner sc) {//parameter
+        int score = 0;
+        List<String> incorrectAnswers = new ArrayList<>();
+        try {
+            for (int i = 0; i < quiz.getQuestions().size(); i++) {
+                System.out.println("\n\n" + (i + 1) + ". " + quiz.getQuestions().get(i));
+
+                // Defensive programming for options retrieval
+                if (quiz.getOptions(i) == null || quiz.getOptions(i).length == 0) {
+                    System.out.println("Error: No options available for this question.");
+                    continue; // Skip this question
+                }
+
+                String[] opts = quiz.getOptions(i);
+                for (int j = 0; j < opts.length; j++) {
+                    System.out.println("   " + (char) ('A' + j) + ". " + opts[j]);
+                }
+
+                System.out.print("Your Answer (A/B/C/D): ");
+                String answer = sc.nextLine().toUpperCase();
+
+                // Validate user input
+                if (!answer.matches("[A-D]")) {
+                    System.out.println("Invalid input. Please enter A, B, C, or D.");
+                    i--; // Repeat the question
+                    continue;
+                }
+
+                String correctAnswer = quiz.getCorrectAnswer(i);
+                if (correctAnswer == null) {
+                    System.out.println("Error: No correct answer found for this question.");
+                    continue; // Skip this question
+                }
+
+                if (answer.equals(correctAnswer)) {
+                    score++;
+                } else {
+                    incorrectAnswers.add((i + 1) + ". " + quiz.getQuestions().get(i));
+                    incorrectAnswers.add("Correct Answer: " + correctAnswer);
+                }
+            }
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Error: Question or answer index is out of bounds. " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred during the quiz: " + e.getMessage());
+        }
+
+        System.out.println("\nQuiz Completed!");
+        System.out.println("Your Score: " + score + "/" + quiz.getQuestions().size());
+        user.addQuizToHistory(quiz.getCategory() + " Quiz (" + quiz.getDifficultyLevel() + ")");
+        user.showQuizHistory();
+
+        if (!incorrectAnswers.isEmpty()) {
+            System.out.println("\nIncorrect Answers:");
+            for (String incorrectAnswer : incorrectAnswers) {
+                System.out.println(incorrectAnswer);
+            }
+        } else {
+            System.out.println("All answers were correct!");
+        }
+    }
+
+
+    private static void generateQuestions(Quiz quiz) {
+        String subject = quiz.getCategory();
+        try {
+            switch (subject) {
+            case "Math":
+                if (quiz.getDifficultyLevel().equals("Easy")) {
+                    quiz.addQuestion("What is 5 + 3?", new String[]{"6", "7", "8", "9"}, "C");
+                    quiz.addQuestion("Solve: 10 - 2.", new String[]{"8", "7", "3", "9"}, "A");
+                    quiz.addQuestion("What is 4 multiplied by 2?", new String[]{"6", "8", "10", "12"}, "B");
+                    quiz.addQuestion("Divide 20 by 5.", new String[]{"2", "3", "4", "5"}, "C");
+                    quiz.addQuestion("What is the square of 3?", new String[]{"6", "7", "8", "9"}, "D");
+                } else if (quiz.getDifficultyLevel().equals("Medium")) {
+                    quiz.addQuestion("What is 15% of 200?", new String[]{"25", "30", "35", "40"}, "B");
+                    quiz.addQuestion("Solve: 12 × (4 + 2).", new String[]{"60", "72", "48", "24"}, "B");
+                    quiz.addQuestion("What is the square root of 81?", new String[]{"7", "8", "9", "10"}, "C");
+                    quiz.addQuestion("If x = 7, find the value of 3x + 2.", new String[]{"23", "24", "25", "26"}, "A");
+                    quiz.addQuestion("Simplify: (5/4) + (3/4).", new String[]{"1", "2", "3", "4"}, "B");
+                } else if (quiz.getDifficultyLevel().equals("Hard")) {
+                    quiz.addQuestion("What is 25 × 24?", new String[]{"600", "575", "625", "480"}, "A");
+                    quiz.addQuestion("Solve: (18 × 3) - (12 ÷ 2).", new String[]{"48", "45", "51", "43"}, "A");
+                    quiz.addQuestion("Find the value of x in 3x + 5 = 20.", new String[]{"5", "7", "6", "8"}, "A");
+                    quiz.addQuestion("What is the value of 10³?", new String[]{"100", "1000", "10000", "100000"}, "B");
+                    quiz.addQuestion("Simplify: (7 × 3) - (2 × 4).", new String[]{"13", "17", "19", "20"}, "A");
+                }
+                break;
+            case "Science":
+                if (quiz.getDifficultyLevel().equals("Easy")) {
+                    quiz.addQuestion("What is the chemical symbol for water?", new String[]{"O", "H2O", "O2", "CO2"}, "B");
+                    quiz.addQuestion("What is the boiling point of water in Celsius?", new String[]{"90", "100", "110", "120"}, "B");
+                    quiz.addQuestion("What is the chemical symbol for oxygen?", new String[]{"O", "O2", "Ox", "O3"}, "A");
+                    quiz.addQuestion("What is the process by which plants make their food?", new String[]{"Photosynthesis", "Respiration", "Digestion", "Transpiration"}, "A");
+                    quiz.addQuestion("Which planet is closest to the Sun?", new String[]{"Earth", "Venus", "Mars", "Mercury"}, "D");
+                } else if (quiz.getDifficultyLevel().equals("Medium")) {
+                    quiz.addQuestion("What is the atomic number of carbon?", new String[]{"6", "12", "8", "10"}, "A");
+                    quiz.addQuestion("Which organelle is responsible for energy production in cells?", new String[]{"Nucleus", "Mitochondria", "Endoplasmic Reticulum", "Golgi Apparatus"}, "B");
+                    quiz.addQuestion("What is the chemical formula for methane?", new String[]{"CO2", "H2O", "CH4", "CO"}, "C");
+                    quiz.addQuestion("Which gas is responsible for global warming?", new String[]{"Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"}, "C");
+                    quiz.addQuestion("What is the boiling point of nitrogen?", new String[]{"-180°C", "-196°C", "-150°C", "-210°C"}, "B");
+                } else if (quiz.getDifficultyLevel().equals("Hard")) {
+                    quiz.addQuestion("What is the chemical formula for calcium carbonate?", new String[]{"CaC13", "Ca2CO3", "CaO", "CaCO3"}, "D");
+                    quiz.addQuestion("What is the molecular mass of water?", new String[]{"18.01 g/mol", "16 g/mol", "12 g/mol", "20 g/mol"}, "A");
+                    quiz.addQuestion("What is the chemical symbol for Uranium?", new String[]{"Ug", "Ur", "U", "Ub"}, "C");
+                    quiz.addQuestion("What is the most abundant gas in Earth's atmosphere?", new String[]{"Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"}, "C");
+                    quiz.addQuestion("What is the atomic number of Iron?", new String[]{"24", "26", "28", "30"}, "B");
+                }
+                break;
+            case "History":
+                if (quiz.getDifficultyLevel().equals("Easy")) {
+                    quiz.addQuestion("Who was the first President of the United States?", new String[]{"George Washington", "Abraham Lincoln", "Thomas Jefferson", "John Adams"}, "A");
+                    quiz.addQuestion("In which year did World War II end?", new String[]{"1940", "1945", "1950", "1960"}, "B");
+                    quiz.addQuestion("What ancient civilization built the pyramids?", new String[]{"Romans", "Greeks", "Egyptians", "Persians"}, "C");
+                    quiz.addQuestion("Who discovered America in 1492?", new String[]{"Columbus", "Magellan", "Vasco da Gama", "Cortes"}, "A");
+                    quiz.addQuestion("What is the Great Wall of China?", new String[]{"A castle", "A road", "A monument", "A wall"}, "D");
+                } else if (quiz.getDifficultyLevel().equals("Medium")) {
+                    quiz.addQuestion("What year did the French Revolution start?", new String[]{"1786", "1787", "1788", "1789"}, "D");
+                    quiz.addQuestion("Who was the first female prime minister of the UK?", new String[]{"Margaret Thatcher", "Queen Elizabeth", "Theresa May", "Harriet Harman"}, "A");
+                    quiz.addQuestion("What was the Renaissance?", new String[]{"A war", "A scientific discovery", "A period of cultural rebirth", "An economic boom"}, "C");
+                    quiz.addQuestion("What treaty ended World War I?", new String[]{"Treaty of Versailles", "Treaty of Paris", "Treaty of Ghent", "Treaty of Tordesillas"}, "A");
+                    quiz.addQuestion("Who was known as the Iron Lady?", new String[]{"Queen Victoria", "Margaret Thatcher", "Indira Gandhi", "Angela Merkel"}, "B");
+                } else if (quiz.getDifficultyLevel().equals("Hard")) {
+                    quiz.addQuestion("Who was the last ruler of the Mughal Empire?", new String[]{"Akbar", "Shah Jahan", "Bahadur Shah Zafar", "Aurangzeb"}, "C");
+                    quiz.addQuestion("What was the primary cause of the American Civil War?", new String[]{"Slavery", "Taxation", "Expansionism", "Territorial Disputes"}, "A");
+                    quiz.addQuestion("Who was the first emperor of China?", new String[]{"Qin Shi Huang", "Han Wudi", "Tang Taizong", "Wu Zetian"}, "A");
+                    quiz.addQuestion("When did the Berlin Wall fall?", new String[]{"1985", "1989", "1991", "1993"}, "B");
+                    quiz.addQuestion("Which country was the first to grant women the right to vote?", new String[]{"United States", "New Zealand", "Australia", "France"}, "B");
+                }
+                break;
+            case "Geography":
+                if (quiz.getDifficultyLevel().equals("Easy")) {
+                    quiz.addQuestion("What is the capital of France?", new String[]{"Paris", "Berlin", "Madrid", "Rome"}, "A");
+                    quiz.addQuestion("Which ocean is the largest?", new String[]{"Atlantic", "Indian", "Pacific", "Arctic"}, "C");
+                    quiz.addQuestion("Name the longest river in the world.", new String[]{"Amazon", "Nile", "Yangtze", "Mississippi"}, "B");
+                    quiz.addQuestion("What is the smallest country in the world?", new String[]{"Monaco", "Nauru", "Vatican City", "San Marino"}, "C");
+                    quiz.addQuestion("Which continent is the Sahara Desert in?", new String[]{"Asia", "Africa", "North America", "Australia"}, "B");
+                } else if (quiz.getDifficultyLevel().equals("Medium")) {
+                    quiz.addQuestion("What is the capital city of Australia?", new String[]{"Sydney", "Melbourne", "Canberra", "Perth"}, "C");
+                    quiz.addQuestion("Which country has the most natural lakes?", new String[]{"Finland", "Russia", "United States", "Canada"}, "D");
+                    quiz.addQuestion("The Amazon River flows in which continent?", new String[]{"Asia", "Africa", "South America", "Australia"}, "C");
+                    quiz.addQuestion("What is the highest mountain in Africa?", new String[]{"Mount Everest", "Mount Kilimanjaro", "Mount Elbrus", "Mount Fuji"}, "B");
+                    quiz.addQuestion("What is the official language of Brazil?", new String[]{"Spanish", "English", "Portuguese", "French"}, "C");
+                } else if (quiz.getDifficultyLevel().equals("Hard")) {
+                    quiz.addQuestion("Which is the largest desert in the world?", new String[]{"Kalahari", "Sahara", "Antartic", "Gobi"}, "C");
+                    quiz.addQuestion("Which country has the most neighboring countries?", new String[]{"Russia", "Brazil", "China", "India"}, "C");
+                    quiz.addQuestion("What is the tallest waterfall in the world?", new String[]{"Niagara Falls", "Victoria Falls", "Angel Falls", "Iguazu Falls"}, "C");
+                    quiz.addQuestion("What is the longest mountain range in the world?", new String[]{"Rocky Mountains", "Himalayas", "Andes", "Alps"}, "C");
+                    quiz.addQuestion("Which is the largest island in the world?", new String[]{"Greenland", "Australia", "New Guinea", "Borneo"}, "A");
+                }
+                break;
+            case "Literature":
+                if (quiz.getDifficultyLevel().equals("Easy")) {
+                    quiz.addQuestion("Who wrote 'Romeo and Juliet'?", new String[]{"Shakespeare", "Dickens", "Hemingway", "Fitzgerald"}, "A");
+                    quiz.addQuestion("What is the title of the first Harry Potter book?", new String[]{"The Philosopher's Stone", "The Chamber of Secrets", "The Goblet of Fire", "The Half-Blood Prince"}, "A");
+                    quiz.addQuestion("Who wrote 'To Kill a Mockingbird'?", new String[]{"J.K. Rowling", "George Orwell", "Harper Lee", "Mark Twain"}, "C");
+                    quiz.addQuestion("What type of animal is Winnie the Pooh?", new String[]{"Bear", "Tiger", "Pig", "Rabbit"}, "A");
+                    quiz.addQuestion("Name a famous work by Charles Dickens.", new String[]{"A Tale of Two Cities", "Moby Dick", "Pride and Prejudice", "1984"}, "A");
+                } else if (quiz.getDifficultyLevel().equals("Medium")) {
+                    quiz.addQuestion("Who wrote '1984'?", new String[]{"Aldous Huxley", "J.R.R. Tolkien", "George Orwell", "Ray Bradbury"}, "C");
+                    quiz.addQuestion("Which novel begins with 'Call me Ishmael'?", new String[]{"Moby Dick", "Pride and Prejudice", "The Great Gatsby", "Anna Karenina"}, "A");
+                    quiz.addQuestion("Who is the author of 'The Catcher in the Rye'?", new String[]{"Harper Lee", "J.D. Salinger", "Ernest Hemingway", "F. Scott Fitzgerald"}, "B");
+                    quiz.addQuestion("What is the name of the fictional detective created by Arthur Conan Doyle?", new String[]{"Sherlock Holmes", "Hercule Poirot", "Sam Spade", "Philip Marlowe"}, "A");
+                    quiz.addQuestion("Who wrote 'The Great Gatsby'?", new String[]{"Ernest Hemingway", "F. Scott Fitzgerald", "Tennessee Williams", "John Steinbeck"}, "B");
+                } else if (quiz.getDifficultyLevel().equals("Hard")) {
+                    quiz.addQuestion("Who wrote 'The Brothers Karamazov'?", new String[]{"Leo Tolstoy", "Fyodor Dostoevsky", "Anton Chekhov", "Vladimir Nabokov"}, "B");
+                    quiz.addQuestion("What is the central theme of 'One Hundred Years of Solitude'?", new String[]{"Modernism", "Realism", "Memory and Past", "Existentialism"}, "C");
+                    quiz.addQuestion("Who wrote 'The Divine Comedy'?", new String[]{"Dante Alighieri", "Virgil", "Homer", "Geoffrey Chaucer"}, "A");
+                    quiz.addQuestion("Who wrote 'Ulysses'?", new String[]{"James Joyce", "Franz Kafka", "Virginia Woolf", "Ernest Hemingway"}, "A");
+                    quiz.addQuestion("In which work does the character Holden Caulfield appear?", new String[]{"The Catcher in the Rye", "The Great Gatsby", "Of Mice and Men", "Catch-22"}, "A");
+                }
+                break;
+            case "General Knowledge":
+                if (quiz.getDifficultyLevel().equals("Easy")) {
+                    quiz.addQuestion("What is the capital of the United Kingdom?", new String[]{"London", "Edinburgh", "Dublin", "Paris"}, "A");
+                    quiz.addQuestion("How many continents are there?", new String[]{"6", "7", "8", "9"}, "B");
+                    quiz.addQuestion("What is the largest animal on Earth?", new String[]{"Elephant", "Blue Whale", "Giraffe", "Shark"}, "B");
+                    quiz.addQuestion("What is the national flower of Japan?", new String[]{"Rose", "Tulip", "Cherry Blossom", "Lotus"}, "C");
+                    quiz.addQuestion("Which country invented the airplane?", new String[]{"USA", "Germany", "France", "Russia"}, "A");
+                } else if (quiz.getDifficultyLevel().equals("Medium")) {
+                    quiz.addQuestion("Which planet is known as the Red Planet?", new String[]{"Mars", "Jupiter", "Saturn", "Venus"}, "A");
+                    quiz.addQuestion("What is the currency of Japan?", new String[]{"Yuan", "Yen", "Won", "Ringgit"}, "B");
+                    quiz.addQuestion("What is the largest city in the world by population?", new String[]{"Tokyo", "New York", "Shanghai", "Delhi"}, "A");
+                    quiz.addQuestion("Which metal is liquid at room temperature?", new String[]{"Gold", "Mercury", "Iron", "Lead"}, "B");
+                    quiz.addQuestion("Which country is known as the Land of the Rising Sun?", new String[]{"China", "Japan", "Korea", "India"}, "B");
+                } else if (quiz.getDifficultyLevel().equals("Hard")) {
+                    quiz.addQuestion("What is the rarest blood type?", new String[]{"Rhnull", "O-", "A+", "B+"}, "A");
+                    quiz.addQuestion("What is the tallest building in the world?", new String[]{"Shanghai Tower", "Burj Khalifa", "Tokyo Skytree", "Eiffel Tower"}, "B");
+                    quiz.addQuestion("Which country is the largest producer of coffee?", new String[]{"Brazil", "Vietnam", "Colombia", "Ethiopia"}, "A");
+                    quiz.addQuestion("What is the longest river in the world?", new String[]{"Amazon", "Yangtze", "Nile", "Mississippi"}, "C");
+                    quiz.addQuestion("In which country was the first Olympic Games held?", new String[]{"Greece", "France", "Italy", "United States"}, "A");
+                }
+                break;            }
+        } catch (Exception e) {
+            System.out.println("Error generating quiz questions: " + e.getMessage());
+        }
+    }
+}
